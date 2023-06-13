@@ -15,6 +15,10 @@ from .dateAndCode_extraction import dateAndCode_extraction
 from .address_from_croppedImage import address_from_croppedImageCSV
 from .values import values
 from .create_JSON import create_JSON
+from .DeleteFolderContents import DeleteFolderContents
+from .UploadManualToBlob import UploadManualToBlob
+from .UploadProcessedToBlob import UploadProcessedToBlob
+
 # from .generate_pdf import generate_pdf
 
 def main(myblob: func.InputStream):
@@ -33,6 +37,9 @@ def main(myblob: func.InputStream):
     encoded_string = base64.b64encode(fileData)
     bytes_file = base64.b64decode(encoded_string, validate=True)
 
+    if os.path.exists('./tmp'):
+        DeleteFolderContents('./tmp')
+
     if not os.path.exists('./tmp/image'):
         os.makedirs('./tmp/image')
 
@@ -41,8 +48,12 @@ def main(myblob: func.InputStream):
     with open(filePath, 'wb') as f:
         f.write(bytes_file)
 
+
     if not os.path.exists('./tmp/manual'):
         os.makedirs('./tmp/manual')
+
+    if not os.path.exists('./tmp/processed'):
+        os.makedirs('./tmp/processed')
 
     confi = r'''
     {
@@ -143,32 +154,39 @@ def main(myblob: func.InputStream):
                 img.save(pdf_filename, 'PDF', resolution=100.0)
                 print("Manual Version generated")
 
-                # UploadManualToBlob(pdf_filename, Blobfilename)
+                UploadManualToBlob(pdf_filename, Blobfilename)
                 # UploadManualToMiwayne(pdf_filename,unprocessedID)
 
-                print("Manual Version uploaded successfully")
+                print("Manual Version uploaded successfully from init")
 
             else:
                 # generate_pdf(date, time, code, fromA,
                 #              toA, manual, filename_png)
                 
-                print("Generated Customer Version PDF.")
+                print("All Data stripped successfully")
 
                 customerPath = f"{code}.pdf"
-                # UploadProcessedToBlob(customerPath, filename_png[:-4])
+                img = Image.open(f"./tmp/image/{filename_png}")
+                pdf_filename = f'./tmp/processed/{customerPath}'
+                Blobfilename = f'{customerPath}'
+
+                img.save(pdf_filename, 'PDF', resolution=100.0)
+
+                UploadProcessedToBlob(pdf_filename, Blobfilename)
                 # UploadProcessedToMiwayne(customerPath, code, unprocessedID)
 
-                print(f"{code} Processed Version uploaded successfully")
+                print(f"{code} Processed Version uploaded successfully from init")
 
         except:
             print("Error in generating Customer Version PDF.")
 
             img = Image.open(f"./tmp/image/{filename_png}")
             pdf_filename = f'./tmp/manual/manual_{filename_png[:-4]}.pdf'
+            Blobfilename = f'{filename_png[:-4]}.pdf'
 
             img.save(pdf_filename, 'PDF', resolution=100.0)
             print("Manual Version generated from except block")
 
-            # UploadManualToBlob(pdf_filename, Blobfilename)
+            UploadManualToBlob(pdf_filename, Blobfilename)
             # UploadManualToMiwayne(pdf_filename)
-            print("Manual Version uploaded successfully from except block")
+            print("Manual Version uploaded successfully from except block in init")
