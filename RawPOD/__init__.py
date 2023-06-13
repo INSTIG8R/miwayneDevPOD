@@ -7,6 +7,8 @@ from PIL import Image
 
 from .UploadTo_rawimage import UploadTo_rawimage
 from .UploadTo_rawpdf import UploadTo_rawpdf
+from .UploadRawToMiwayne import UploadRawToMiwayne
+from .DeleteFolderContents import DeleteFolderContents
 
 def main(myblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
@@ -23,6 +25,9 @@ def main(myblob: func.InputStream):
     fileData = myblob.read()
     encoded_string = base64.b64encode(fileData)
     bytes_file = base64.b64decode(encoded_string, validate=True)
+
+    if os.path.exists('./tmp'):
+        DeleteFolderContents('./tmp')
 
     if not os.path.exists('./tmp'):
         os.makedirs('./tmp')
@@ -51,6 +56,7 @@ def main(myblob: func.InputStream):
 
     if fileName.endswith('.pdf'):
 
+
         images = convert_from_path(filePath)
 
         # loop through each image and save it as a PNG file
@@ -62,5 +68,10 @@ def main(myblob: func.InputStream):
             image = Image.open(f'./tmp/image/{fileNameNoExt[0]}_page_{i+1}.png')
             pdf_path = f'./tmp/pdf/{fileNameNoExt[0]}_page_{i+1}.pdf'
             image.save(pdf_path, 'PDF')
-            UploadTo_rawpdf(f'{pdfPath}{fileNameNoExt[0]}_page_{i+1}.pdf', f'{fileNameNoExt[0]}_page_{i+1}.pdf')
+            size_in_bytes = os.path.getsize(pdf_path)
+            size_in_kb = size_in_bytes / 1024
+            print("size_in_kb ",size_in_kb," kb")
+            blobUrl = UploadTo_rawpdf(f'{pdfPath}{fileNameNoExt[0]}_page_{i+1}.pdf', f'{fileNameNoExt[0]}_page_{i+1}.pdf')
+            print(blobUrl)
+            UploadRawToMiwayne(f'{fileNameNoExt[0]}_page_{i+1}.pdf',blobUrl)
             

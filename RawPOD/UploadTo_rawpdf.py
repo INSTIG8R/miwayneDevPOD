@@ -15,5 +15,7 @@ def UploadTo_rawpdf(file_path,file_name):
     blob = BlobClient.from_connection_string(conn_str=connection_string, container_name=container_name, blob_name=file_name)
     # blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
     with open(file_path,"rb") as data:
-        blob.upload_blob(data)
+        blob.upload_blob(data,overwrite=True)
         print(f"Uploaded {file_name}.")
+        blobUrl = blob.url
+        return blobUrl
