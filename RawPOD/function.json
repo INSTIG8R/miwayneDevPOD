@@ -6,7 +6,7 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "rawfiles/{name}",
-      "connection": "AzureWebJobsStorage"
+      "connection": "sakirsapoddev1_STORAGE"
     }
   ]
 }

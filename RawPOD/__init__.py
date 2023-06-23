@@ -61,9 +61,8 @@ def main(myblob: func.InputStream):
 
         # loop through each image and save it as a PNG file
         for i, image in enumerate(images):
+            
             image.save(f'./tmp/image/{fileNameNoExt[0]}_page_{i+1}.png', 'PNG')
-            UploadTo_rawimage(f'{imagePath}{fileNameNoExt[0]}_page_{i+1}.png', f'{fileNameNoExt[0]}_page_{i+1}.png')
-
 
             image = Image.open(f'./tmp/image/{fileNameNoExt[0]}_page_{i+1}.png')
             pdf_path = f'./tmp/pdf/{fileNameNoExt[0]}_page_{i+1}.pdf'
@@ -73,5 +72,18 @@ def main(myblob: func.InputStream):
             print("size_in_kb ",size_in_kb," kb")
             blobUrl = UploadTo_rawpdf(f'{pdfPath}{fileNameNoExt[0]}_page_{i+1}.pdf', f'{fileNameNoExt[0]}_page_{i+1}.pdf')
             print(blobUrl)
-            UploadRawToMiwayne(f'{fileNameNoExt[0]}_page_{i+1}.pdf',blobUrl)
+            response = UploadRawToMiwayne(f'{fileNameNoExt[0]}_page_{i+1}.pdf',blobUrl)
+
+            print(response.json())
+
+            data = response.json()
+
+            id_value = data['data']['id']
+
+            filename_withpath = f"./tmp/image/{fileNameNoExt[0]}_page_{i+1}_{id_value}.png"
+
+            print(filename_withpath)
+
+            image.save(filename_withpath, 'PNG')
+            UploadTo_rawimage(filename_withpath, f'{fileNameNoExt[0]}_page_{i+1}_{id_value}.png')
             
