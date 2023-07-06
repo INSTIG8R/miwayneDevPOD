@@ -1,4 +1,5 @@
 import pandas as pd
+import logging 
 import re
 from datetime import datetime
 import csv
@@ -38,19 +39,19 @@ def dateAndCode_extraction(df, image):
         # check if sealink company
         is_sealink = bool(re.search(sealink_pattern, text))
         if is_sealink:
-            print("sealink:", is_sealink)
+            logging.info(f"sealink: {is_sealink}\n")
             from_ad, to_ad = sealink_address(image)
 
         # check if sub60 company
         is_sub60 = bool(re.search(sub60_pattern, text))
         if is_sub60:
-            print("sub60:", is_sub60)
+            logging.info(f"sub60: {is_sub60}\n")
             from_ad, to_ad = sub60(image)
 
         # check if bascik company
         is_bascik = bool(re.search(bascik_pattern, text))
         if is_bascik:
-            print("bascik:", is_bascik)
+            logging.info(f"bascik: {is_bascik}\n" )
             from_ad, to_ad, uniqueCode = bascik(image)
 
         with open('./tmp/Date_Code.csv', mode='a', newline='') as file:

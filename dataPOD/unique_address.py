@@ -1,4 +1,4 @@
-
+import logging
 import cv2
 import pytesseract
 from .removeMarginAndResize import *
@@ -71,10 +71,10 @@ def bascik(img):
     to_address = text2.strip().replace("\\n", "\n")
     refcode = text3.strip().replace("\\n", "\n")
 
-    # Print the extracted text
-    print(from_address)
-    print(to_address)
-    print("\n", refcode)
+    # logging.info the extracted text
+    logging.info(f"\n{from_address}")
+    logging.info(f"\n{to_address}")
+    logging.info(f"\n {refcode}" )
     return from_address, to_address, refcode
 
 # info = pd.read_csv('Text.csv')
@@ -109,8 +109,8 @@ def sub60(img):
     from_address = text1.strip().replace("\\n", "\n")
     to_address = text2.strip().replace("\\n", "\n")
 
-    # Print the extracted text
-    print(from_address)
-    print(to_address)
+    # logging.info the extracted text
+    logging.info(from_address)
+    logging.info(to_address)
 
     return from_address, to_address

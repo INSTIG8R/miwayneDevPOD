@@ -18,6 +18,9 @@ from .create_JSON import create_JSON
 from .DeleteFolderContents import DeleteFolderContents
 from .UploadManualToBlob import UploadManualToBlob
 from .UploadProcessedToBlob import UploadProcessedToBlob
+from .UploadManualToMiwayne import UploadManualToMiwayne
+from .UploadProcessedToMiwayne import UploadProcessedToMiwayne
+from .format_datetime import format_datetime
 
 # from .generate_pdf import generate_pdf
 
@@ -30,8 +33,13 @@ def main(myblob: func.InputStream):
     fileName = nameWithPath.split("/")[-1]
     fileNameNoExt = fileName.split(".")[:-1]
 
+    # Extract the desired part
+    start_index = nameWithPath.rfind('_') + 1
+    end_index = nameWithPath.rfind('.')
+    id = nameWithPath[start_index:end_index]
+
     # logging.info("file name: {}".format(fileName))
-    print("filename : " + fileName)
+    logging.info("filename : " + fileName)
 
     fileData = myblob.read()
     encoded_string = base64.b64encode(fileData)
@@ -98,7 +106,7 @@ def main(myblob: func.InputStream):
                     if text.strip():
                         writer.writerow([filename_png, text])
             except:
-                print("Error in Text extraction from whole image.")
+                logging.info("Error in Text extraction from whole image.")
 
         try:
             # bounding boxes are saved in a folder
@@ -126,7 +134,7 @@ def main(myblob: func.InputStream):
                             writer.writerow([filename_box, text])
 
         except:
-            print("Couldn't create bounding boxes, tile cannot extend outside image")
+            logging.info("Couldn't create bounding boxes, tile cannot extend outside image")
 
         try:
             dates, Codes, Times, from_ad, to_ad = '', '', '', None, None
@@ -140,9 +148,13 @@ def main(myblob: func.InputStream):
             date, time, code, fromA, toA, manual = values(
                 dates, Times, Codes, from_ad, to_ad, uniqueCode, './tmp/Address_found.csv')
 
-            print("\n\nDate Time Code:\n", date, time, code, "\nSender:\n",
-                  fromA, "\nReceiver:\n", toA, "\nManual:", manual)
+            logging.info(f"\n\nDate Time Code:{date},{time},{code}\n"
+                         f"\nSender: {fromA}\n"
+                         f"\nReceiver: {toA}\n"
+                         f"\nManual: {manual}")
             create_JSON(filename_png, date, time, code, fromA, toA, manual)
+
+            deliveryDate = format_datetime(date,time)
 
             if manual:
                 customerPath = f"manual_{filename_png}.pdf"
@@ -152,18 +164,18 @@ def main(myblob: func.InputStream):
                 Blobfilename = f'{filename_png[:-4]}.pdf'
 
                 img.save(pdf_filename, 'PDF', resolution=100.0)
-                print("Manual Version generated")
+                logging.info("Manual Version generated")
 
                 UploadManualToBlob(pdf_filename, Blobfilename)
-                # UploadManualToMiwayne(pdf_filename,unprocessedID)
+                UploadManualToMiwayne(id,code, fromA,toA,deliveryDate)
 
-                print("Manual Version uploaded successfully from init")
+                logging.info("Manual Version uploaded successfully from init")
 
             else:
                 # generate_pdf(date, time, code, fromA,
                 #              toA, manual, filename_png)
                 
-                print("All Data stripped successfully")
+                logging.info("All Data stripped successfully")
 
                 customerPath = f"{code}.pdf"
                 img = Image.open(f"./tmp/image/{filename_png}")
@@ -173,20 +185,20 @@ def main(myblob: func.InputStream):
                 img.save(pdf_filename, 'PDF', resolution=100.0)
 
                 UploadProcessedToBlob(pdf_filename, Blobfilename)
-                # UploadProcessedToMiwayne(customerPath, code, unprocessedID)
+                UploadProcessedToMiwayne(id,code, fromA,toA,deliveryDate)
 
-                print(f"{code} Processed Version uploaded successfully from init")
+                logging.info(f"{code} Processed Version uploaded successfully from init")
 
         except:
-            print("Error in generating Customer Version PDF.")
+            logging.info("Error in generating Customer Version PDF.")
 
             img = Image.open(f"./tmp/image/{filename_png}")
             pdf_filename = f'./tmp/manual/manual_{filename_png[:-4]}.pdf'
             Blobfilename = f'{filename_png[:-4]}.pdf'
 
             img.save(pdf_filename, 'PDF', resolution=100.0)
-            print("Manual Version generated from except block")
+            logging.info("Manual Version generated from except block")
 
             UploadManualToBlob(pdf_filename, Blobfilename)
-            # UploadManualToMiwayne(pdf_filename)
-            print("Manual Version uploaded successfully from except block in init")
+            UploadManualToMiwayne(id,code, fromA,toA,deliveryDate)
+            logging.info("Manual Version uploaded successfully from except block in init")

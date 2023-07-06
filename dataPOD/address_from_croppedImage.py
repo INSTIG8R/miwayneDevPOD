@@ -8,12 +8,12 @@ import json
 
 def address_from_croppedImageCSV():
     authUrl = "https://dev-rtgqet4r.au.auth0.com/oauth/token"
-    cityUrl = "https://dev.test-wayne.com/api/Postcodes/City"
+    cityUrl = "https://stage.test-wayne.com/api/Postcodes/City"
 
     authPayload = {"grant_type": "password",
                    "username": "SABBIR.SRISTY@BISHUDIGITAL.COM",
                    "password": "Iamtheone@36",
-                   "audience": "https://dev.test-wayne.com/api/",
+                   "audience": "https://stage.test-wayne.com/api/",
                    "client_id": "gyNB4hFUbB3skeBssVeSdnNUofTo1wS0",
                    "client_secret": "PxJ59wcHwdaOkGqMAhj_PX9r4PgdTuJs-cTIpYcfxQhSRe2eeOswxryJ4XSl37sJ",
                    "scope": "openid profile email"}
@@ -22,7 +22,7 @@ def address_from_croppedImageCSV():
     authResponse = requests.post(
         authUrl, data=authPayload, headers=authHeaders)
 
-    print("response is ", authResponse)
+    logging.info(f"response is {authResponse}")
 
     if authResponse.status_code == 200:
         logging.info("Authentication successful")
@@ -45,7 +45,7 @@ def address_from_croppedImageCSV():
     my_cities = ['wiri', 'st johns', 'avonhead', 'waltham', 'harewood', 'albany',
                  'manukau', 'henderson', 'wellington', 'christchurch', 'vanessa', 'rakaia', 'tamaki']
     [city_list.append(city) for city in my_cities if city not in city_list]
-    # print(city_list)
+    # logging.info(city_list)
 
     # New CSV for storing extracted addresses
     with open('./tmp/Address_found.csv', mode='w', newline='') as file:
@@ -65,5 +65,5 @@ def address_from_croppedImageCSV():
                     writer = csv.writer(file)
                     if text.strip():
                         writer.writerow([s, ad])
-                # print(s)
-                # print(ad)
+                # logging.info(s)
+                # logging.info(ad)
