@@ -7,15 +7,15 @@ def UploadRawToMiwayne(fileName,fileUrl):
     ####################### List of API Endpoint #######################
     authUrl = "https://dev-rtgqet4r.au.auth0.com/oauth/token"
     # categoryUrl = "https://dev.test-wayne.com/api/DocumentCategories"
-    rawPODUrl = "https://dev.test-wayne.com/api/pod/raw"
-    configUrl = "https://dev.test-wayne.com/api/UIConfigurations/data/"
+    rawPODUrl = "https://stage.test-wayne.com/api/pod/raw"
+    configUrl = "https://stage.test-wayne.com/api/UIConfigurations/data/"
     
     ####################### Auth0 Token #######################
     
     authPayload={"grant_type": "password",
             "username": "SABBIR.SRISTY@BISHUDIGITAL.COM",
             "password": "Iamtheone@36",
-            "audience": "https://dev.test-wayne.com/api/",
+            "audience": "https://stage.test-wayne.com/api/",
             "client_id": "gyNB4hFUbB3skeBssVeSdnNUofTo1wS0",
             "client_secret": "PxJ59wcHwdaOkGqMAhj_PX9r4PgdTuJs-cTIpYcfxQhSRe2eeOswxryJ4XSl37sJ",
             "scope": "openid profile email"}
