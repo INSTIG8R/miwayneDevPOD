@@ -13,8 +13,8 @@ def dateAndCode_extraction(df, image):
 
     # define the regex pattern to match dates in the format YYYY-MM-DD
     date_pattern = r'\d{2}/\d{2}/\d{4}|\d{1}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4}|\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{2}'
-    code_pattern = r'ECC[A-Z0-9]{7}|ECW[A-Z0-9]{7}|IFL[0-9]{7}|1FL[0-9]{7}|ILF[0-9]{7}|£CC[A-Z0-9]{7}|—CC[A-Z0-9]{7}|€CC[A-Z0-9]{7}|Ecc[A-Z0-9]{7}|Ecco[A-Z0-9]{7}|\(FL[0-9]{7}'
-    time_pattern = r'[0-9]{2}:[0-9]{2} a.m|[0-9]{2}:[0-9]{2} p.m|[0-9]{1}:[0-9]{2} a.m|[0-9]{1}:[0-9]{2} p.m|[0-9]{2}:[0-9]{2}'
+    code_pattern = r'ECC[A-Z0-9]{7}|ECW[A-Z0-9]{7}|IFL[0-9]{7}|1FL[0-9]{7}|ILF[0-9]{7}|£CC[A-Z0-9]{7}|—CC[A-Z0-9]{7}|€CC[A-Z0-9]{7}|Ecc[A-Z0-9]{7}|ECc[A-Z0-9]{7}|Ecco[A-Z0-9]{7}|\(FL[0-9]{7}|{FL[0-9]{7}'
+    time_pattern = r'[0-9]{2}:[0-9]{2} a.m|[0-9]{2}:[0-9]{2} p.m|[0-9]{1}:[0-9]{2} a.m|[0-9]{1}:[0-9]{2} p.m|[0-9]{1}:[0-9]{2} PM|[0-9]{1}:[0-9]{2} AM|[0-9]{2}:[0-9]{2}'
 
     sealink_pattern = r'\bSEALINK\b'
     sub60_pattern = r'\bSUB60\b'

@@ -68,10 +68,12 @@ def main(myblob: func.InputStream):
     "OCR": {
         "ImagePreprocessing": {
         "Deskew": true,
-        "CorrectOrientation": true
+        "CorrectOrientation": true,
+        "EnhanceContrast": true,
+        "Binarize": true
         },
         "Segmentation": {
-        "Mode": "Block",
+        "Mode": "Paragraph",
         "Language": "eng",
         "PageSegMode": "auto"
         },
@@ -147,6 +149,10 @@ def main(myblob: func.InputStream):
 
             date, time, code, fromA, toA, manual = values(
                 dates, Times, Codes, from_ad, to_ad, uniqueCode, './tmp/Address_found.csv')
+
+            if not code.strip():
+                manual = True
+                logging.info("ConNote not found")
 
             logging.info(f"\n\nDate Time Code:{date},{time},{code}\n"
                          f"\nSender: {fromA}\n"

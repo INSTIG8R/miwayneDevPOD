@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-
+import logging
 
 def values(dates, Times, Codes, from_ad, to_ad, uniqueCode, df):
     # info = pd.read_csv('Date_Code.csv')
@@ -20,17 +20,17 @@ def values(dates, Times, Codes, from_ad, to_ad, uniqueCode, df):
         if not Codes:
             code = uniqueCode
         else:
-            code = Codes[0]
+            code = Codes[0].strip()
             if code[0] == '—' or code[0] == '£' or code[0] == '€':
                 code = 'E' + code[1:]
-            elif code[0] == '1' or code[0] == '(':
+            elif code[0] == '1'or code[0] == '('or code[0] == '{':
                 code = 'I' + code[1:]
-            elif code[:3] == 'Ecc':
+            elif code[:3] == 'Ecc' or code[:3] == 'ECc' :
                 code = 'ECC' + code[3:]
     except (IndexError, TypeError):
         code = ' '
         manual = True
-        print("Ref Code Not Found")
+        logging.info("Ref Code Not Found")
 
     # TIME
     try:
