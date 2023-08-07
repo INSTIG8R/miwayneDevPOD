@@ -5,16 +5,20 @@ import os
 from pdf2image import convert_from_path
 from PIL import Image
 
+
 from .UploadTo_rawimage import UploadTo_rawimage
 from .UploadTo_rawpdf import UploadTo_rawpdf
 from .UploadRawToMiwayne import UploadRawToMiwayne
 from .DeleteFolderContents import DeleteFolderContents
+from .GetAuth0Token import GetAuth0Token
 
-def main(myblob: func.InputStream):
+async def main(myblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes")
     
+    logging.info("###########################  new function started  ###########################")
+
     nameWithPath = myblob.name
     fileName = nameWithPath.split("/")[-1]
     fileNameNoExt = fileName.split(".")[:-1]
@@ -25,10 +29,12 @@ def main(myblob: func.InputStream):
     encoded_string = base64.b64encode(fileData)
     bytes_file = base64.b64decode(encoded_string, validate=True)
 
-    logging.info(bytes_file)
+    logging.info(f"given file in bytes is : \n"
+                 f"{bytes_file}")
 
     if os.path.exists('./tmp'):
-        DeleteFolderContents('./tmp')
+        DeleteFolderContents_result = DeleteFolderContents('./tmp')
+        logging.info(DeleteFolderContents_result)
 
     if not os.path.exists('./tmp'):
         os.makedirs('./tmp')
@@ -69,19 +75,26 @@ def main(myblob: func.InputStream):
 
     if not os.path.exists('./tmp/image'):
         os.makedirs('./tmp/image')
+        logging.info("image folder created")
+
 
     if not os.path.exists('./tmp/pdf'):
         os.makedirs('./tmp/pdf')
+        logging.info("pdf folder created")
 
     if not os.path.exists('./tmp/manual'):
         os.makedirs('./tmp/manual')
+        logging.info("manual folder created")
 
     pdfPath = './tmp/pdf/'
 
     if not fileName.endswith('.pdf'):
+        logging.info("file doesn't end with .pdf")
         image = Image.open(filePath)
-        pdf_path = './tmp/' + fileNameNoExt[0] + '.pdf'
-        image.save(pdf_path, 'PDF')
+        filePath = './tmp/' + fileNameNoExt[0] + '.pdf'
+        image.save(filePath, 'PDF')
+
+    id_token = GetAuth0Token()
 
     if fileName.endswith('.pdf'):
         for attempt in range(5):
@@ -100,15 +113,16 @@ def main(myblob: func.InputStream):
                             pdf_path = f'./tmp/pdf/{fileNameNoExt[0]}_page_{i+1}.pdf'
                             image.save(pdf_path, 'PDF')
                             size_in_bytes = os.path.getsize(pdf_path)
-                            size_in_kb = size_in_bytes / 1024
+                            size_in_kb_float = size_in_bytes / 1024
+                            size_in_kb = int(size_in_kb_float)
                             logging.info(f"size_in_kb {size_in_kb} kb")
                             blobUrl = UploadTo_rawpdf(f'{pdfPath}{fileNameNoExt[0]}_page_{i+1}.pdf', f'{fileNameNoExt[0]}_page_{i+1}.pdf')
-                            logging.info(blobUrl)
-                            response = UploadRawToMiwayne(f'{fileNameNoExt[0]}_page_{i+1}.pdf', blobUrl)
-
-                            logging.info(response.json())
-
+                            logging.info(f"blobUrl is : {blobUrl}")
+                            response = UploadRawToMiwayne(f'{fileNameNoExt[0]}_page_{i+1}.pdf', blobUrl,size_in_kb, id_token)
                             data = response.json()
+                            logging.info(f"response from upload raw to miwayne is : {data}")
+
+                            
 
                             id_value = data['data']['id']
 
@@ -117,7 +131,11 @@ def main(myblob: func.InputStream):
                             logging.info(filename_withpath)
 
                             image.save(filename_withpath, 'PNG')
-                            UploadTo_rawimage(filename_withpath, f'{fileNameNoExt[0]}_page_{i+1}_{id_value}.png')
+
+
+                            log = UploadTo_rawimage(filename_withpath, f'{fileNameNoExt[0]}_page_{i+1}_{id_value}.png')
+
+                            logging.info(log)
                             logging.info(f"Image number:{i+1} ended")
                             
                         except Exception as e:
@@ -130,5 +148,7 @@ def main(myblob: func.InputStream):
             except Exception as e:
                 logging.error(f"Error converting images from PDF: {str(e)}")
 
-    if os.path.exists('./tmp'):
-        DeleteFolderContents('./tmp')
+    logging.info(f"completed working on function {fileName}")
+
+    # if os.path.exists('./tmp'):
+    #     DeleteFolderContents('./tmp')
