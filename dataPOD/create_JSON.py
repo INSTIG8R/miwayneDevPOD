@@ -11,3 +11,7 @@ def create_JSON(filename, date, time, code, fromA, toA, manual):
     # Save the dictionary as a JSON file
     with open('Output.json', 'a') as f:
         json.dump(key_value, f)
+
+    log = "completed function create_JSON"
+
+    return log

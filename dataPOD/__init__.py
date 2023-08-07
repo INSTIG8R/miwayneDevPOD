@@ -8,6 +8,7 @@ import numpy as np
 import pytesseract
 from PIL import Image
 import pandas as pd
+import asyncio
 
 from .clean_image import clean_image
 from .cropBoundingBox import cropBoundingBox
@@ -21,14 +22,16 @@ from .UploadProcessedToBlob import UploadProcessedToBlob
 from .UploadManualToMiwayne import UploadManualToMiwayne
 from .UploadProcessedToMiwayne import UploadProcessedToMiwayne
 from .format_datetime import format_datetime
+from .GetAuth0Token import GetAuth0Token
 
-# from .generate_pdf import generate_pdf
 
 def main(myblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes")
     
+    logging.info("###########################  new function started  ###########################")
+
     nameWithPath = myblob.name
     fileName = nameWithPath.split("/")[-1]
     fileNameNoExt = fileName.split(".")[:-1]
@@ -46,7 +49,8 @@ def main(myblob: func.InputStream):
     bytes_file = base64.b64decode(encoded_string, validate=True)
 
     if os.path.exists('./tmp'):
-        DeleteFolderContents('./tmp')
+        DeleteFolderContents_result = DeleteFolderContents('./tmp')
+        logging.info(DeleteFolderContents_result)
 
     if not os.path.exists('./tmp/image'):
         os.makedirs('./tmp/image')
@@ -88,12 +92,16 @@ def main(myblob: func.InputStream):
     }
     '''
 
+    id_token = GetAuth0Token()
+
     with open('./tmp/TextDetected.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
         # Write header row to the CSV file
         writer.writerow(['Filename', 'Extracted Text'])
 
     for filename_png in os.listdir('./tmp/image/'):
+
+        logging.info(f"started working on {filename_png}")
 
         if filename_png.endswith('.png'):
 
@@ -112,7 +120,9 @@ def main(myblob: func.InputStream):
 
         try:
             # bounding boxes are saved in a folder
-            cropBoundingBox(cleaned, filename_png)
+            cropBoundingBox_result = cropBoundingBox(cleaned, filename_png)
+
+            logging.info(cropBoundingBox_result)
 
             # Set cropped image folder path
             bounding_box_path = f"./tmp/croppedImage/{filename_png[:-4]}_boxes"
@@ -145,7 +155,9 @@ def main(myblob: func.InputStream):
                 whole_page, image)
             # dateAndCode_CSV = pd.read_csv('./tmp/Date_Code.csv')
 
-            address_from_croppedImageCSV()
+            address_from_croppedImageCSV_result = address_from_croppedImageCSV(id_token)
+
+            logging.info(address_from_croppedImageCSV_result)
 
             date, time, code, fromA, toA, manual = values(
                 dates, Times, Codes, from_ad, to_ad, uniqueCode, './tmp/Address_found.csv')
@@ -158,7 +170,10 @@ def main(myblob: func.InputStream):
                          f"\nSender: {fromA}\n"
                          f"\nReceiver: {toA}\n"
                          f"\nManual: {manual}")
-            create_JSON(filename_png, date, time, code, fromA, toA, manual)
+            
+            create_JSON_result = create_JSON(filename_png, date, time, code, fromA, toA, manual)
+
+            logging.info(create_JSON_result)
 
             deliveryDate = format_datetime(date,time)
 
@@ -172,8 +187,10 @@ def main(myblob: func.InputStream):
                 img.save(pdf_filename, 'PDF', resolution=100.0)
                 logging.info("Manual Version generated")
 
-                UploadManualToBlob(pdf_filename, Blobfilename)
-                UploadManualToMiwayne(id,code, fromA,toA,deliveryDate)
+                log = UploadManualToBlob(pdf_filename, Blobfilename)
+                logging.info(f"from init py log = {log}")
+                response = UploadManualToMiwayne(id,code, fromA,toA,deliveryDate,id_token)
+                logging.info(f"miwayne upload from init py = {response}")
 
                 logging.info("Manual Version uploaded successfully from init")
 
@@ -190,9 +207,10 @@ def main(myblob: func.InputStream):
 
                 img.save(pdf_filename, 'PDF', resolution=100.0)
 
-                UploadProcessedToBlob(pdf_filename, Blobfilename)
-                UploadProcessedToMiwayne(id,code, fromA,toA,deliveryDate)
-
+                log = UploadProcessedToBlob(pdf_filename, Blobfilename)
+                logging.info(f"from init py log = {log}")
+                response = UploadProcessedToMiwayne(id,code, fromA,toA,deliveryDate,id_token)
+                logging.info(f"miwayne upload from init py = {response}")
                 logging.info(f"{code} Processed Version uploaded successfully from init")
 
         except:
@@ -205,6 +223,12 @@ def main(myblob: func.InputStream):
             img.save(pdf_filename, 'PDF', resolution=100.0)
             logging.info("Manual Version generated from except block")
 
-            UploadManualToBlob(pdf_filename, Blobfilename)
-            UploadManualToMiwayne(id,code, fromA,toA,deliveryDate)
+            log = UploadManualToBlob(pdf_filename, Blobfilename)
+            logging.info(f"from init py log = {log}")
+            response = UploadManualToMiwayne(id,code, fromA,toA,deliveryDate,id_token)
+            logging.info(f"miwayne upload from init py = {response}")
             logging.info("Manual Version uploaded successfully from except block in init")
+
+        logging.info(f"finised working on {filename_png}")
+
+    logging.info(f"completed working on function {fileName}")

@@ -6,32 +6,9 @@ import logging
 import json
 
 
-def address_from_croppedImageCSV():
+def address_from_croppedImageCSV(id_token):
     authUrl = "https://dev-rtgqet4r.au.auth0.com/oauth/token"
-    cityUrl = "https://stage.test-wayne.com/api/Postcodes/City"
-
-    authPayload = {"grant_type": "password",
-                   "username": "SABBIR.SRISTY@BISHUDIGITAL.COM",
-                   "password": "Iamtheone@36",
-                   "audience": "https://stage.test-wayne.com/api/",
-                   "client_id": "gyNB4hFUbB3skeBssVeSdnNUofTo1wS0",
-                   "client_secret": "PxJ59wcHwdaOkGqMAhj_PX9r4PgdTuJs-cTIpYcfxQhSRe2eeOswxryJ4XSl37sJ",
-                   "scope": "openid profile email"}
-    authHeaders = {'content-type': "application/x-www-form-urlencoded"}
-
-    authResponse = requests.post(
-        authUrl, data=authPayload, headers=authHeaders)
-
-    logging.info(f"response is {authResponse}")
-
-    if authResponse.status_code == 200:
-        logging.info("Authentication successful")
-        id_token = authResponse.json()['access_token']
-        logging.info("id token: {}".format(id_token))
-    else:
-        logging.info("Authentication failed")
-
-    logging.info(type(id_token))
+    cityUrl = "https://dev.test-wayne.com/api/Postcodes/City"
 
     cityHeaders = {
         "Authorization": "Bearer " + id_token
@@ -67,3 +44,7 @@ def address_from_croppedImageCSV():
                         writer.writerow([s, ad])
                 # logging.info(s)
                 # logging.info(ad)
+
+    log = "finised function address_from_croppedImageCSV"
+
+    return log

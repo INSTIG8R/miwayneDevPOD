@@ -51,3 +51,7 @@ def cropBoundingBox(img, filename):
             f"./tmp/croppedImage/{filename[:-4]}_boxes/box_{i+1}.png", roi)
 
     cv2.imwrite(f"./tmp/{filename[:-4]}_bounding_image.jpg", image)
+
+    log = "finised function cropBoundingBox"
+
+    return log
