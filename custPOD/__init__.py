@@ -16,7 +16,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         req_body = req.get_json()
         response = json.dumps(req_body)
 
-        print(response)
+        logging.info(response)
 
         req_bodyText = json.loads(response)
 
@@ -35,8 +35,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         date_str = date.strftime("%Y-%m-%d")
         time_str = time.strftime("%H:%M:%S")
 
-        print("Date:", date)
-        print("Time:", time_str)
+        logging.info(f"Date:  {date}\n")
+        logging.info(f"Time: {time_str}\n" )
         
         if os.path.exists('./tmp'):
             DeleteFolderContents('./tmp')
@@ -63,10 +63,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         blobUrl = UploadCustToBlob(custPOD_path,custPOD_filename)
 
+        logging.info(f"\n\nblobUrl is : {blobUrl}\n\n")
 
 
         url = {
-            "url" : image_path,
+            "url" : blobUrl,
             "date"  :  date_str,
             "time"  :  time_str,
             "consignmentNote"  :  code,

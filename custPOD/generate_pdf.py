@@ -18,7 +18,7 @@ def generate_pdf(date,time,code,fromA,toA,logo_path,screenshot_path,custPOD_path
   with open(image, "rb") as f:
       img_width, img_height = canvas.ImageReader(f).getSize()
 
-  #print(letter)
+  #logging.info(letter)
 
   # Calculate the center position of the page
   center_x = letter[0]/2
@@ -39,7 +39,7 @@ def generate_pdf(date,time,code,fromA,toA,logo_path,screenshot_path,custPOD_path
   col_width = table_width / 2
   table_bottom_y = table_y - table_height 
 
-  #print("table_x:",table_x, "\ntable_y:",table_y,"\ntable_height",table_height,"\ntable_bottom_y",table_bottom_y,"\nrow_height:",row_height,"\ncol_width:",col_width)
+  #logging.info("table_x:",table_x, "\ntable_y:",table_y,"\ntable_height",table_height,"\ntable_bottom_y",table_bottom_y,"\nrow_height:",row_height,"\ncol_width:",col_width)
 
   # Draw the title
   c.setFont("Helvetica-Bold", 14)
@@ -93,14 +93,14 @@ def generate_pdf(date,time,code,fromA,toA,logo_path,screenshot_path,custPOD_path
   col_width = table_width / 2
   text_x, text_y = table_x + col_width / 2, table_y + row_height / 2
   table_bottom_y = table_y - table_height
-  #print(table_y)
+  #logging.info(table_y)
 
 
   # Draw the title
   c.setFont("Helvetica-Bold", 10)  # or 10, or any other desired font size
   title_x, title_y = table_x + table_width / 7.5, table_y +  table_height/3 + 0.75 * inch
   c.drawCentredString(title_x, title_y, "DELIVERY DETAILS")
-  #print(title_y)
+  #logging.info(title_y)
 
 
 
