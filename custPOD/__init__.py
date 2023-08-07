@@ -32,8 +32,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         date = datetime_obj.date()
         time = datetime_obj.time()
 
-        date_str = date.strftime("%Y-%m-%d")
-        time_str = time.strftime("%H:%M:%S")
+        date_str = date.strftime("%d-%m-%Y")
+        time_str = time.strftime("%H:%M")
 
         logging.info(f"Date:  {date}\n")
         logging.info(f"Time: {time_str}\n" )
