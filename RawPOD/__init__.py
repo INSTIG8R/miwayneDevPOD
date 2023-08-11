@@ -130,7 +130,7 @@ async def main(myblob: func.InputStream):
 
                             id_value = data['data']['id']
 
-                            filename_withpath = f"./tmp/image/{fileNameNoExt[0]}_page_{i+1}_{id_value}.png"
+                            filename_withpath = f'{folderName}/image/{fileNameNoExt[0]}_page_{i+1}_{id_value}.png'
 
                             logging.info(filename_withpath)
 
