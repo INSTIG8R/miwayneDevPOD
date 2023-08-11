@@ -21,5 +21,5 @@ def UploadTo_rawpdf(file_path,file_name):
     with open(file_path,"rb") as data:
         blob.upload_blob(data,overwrite=True, content_settings=content_settings)
         logging.info(f"Uploaded {file_name}.")
-        blobUrl = blob.url       
+        blobUrl = blob.url
     return blobUrl
