@@ -31,15 +31,19 @@ async def main(myblob: func.InputStream):
 
     logging.info(f"given file in bytes is : \n"
                  f"{bytes_file}")
+    
+    folderName = f"./{fileNameNoExt}"
 
-    if os.path.exists('./tmp'):
-        DeleteFolderContents_result = DeleteFolderContents('./tmp')
-        logging.info(DeleteFolderContents_result)
+    logging.info(f"Folder Name is : {folderName}")
 
-    if not os.path.exists('./tmp'):
-        os.makedirs('./tmp')
+    # if os.path.exists(f'{folderName}/'):
+    #     DeleteFolderContents_result = DeleteFolderContents(f'{folderName}/')
+    #     logging.info(DeleteFolderContents_result)
 
-    filePath = './tmp/' + fileName
+    if not os.path.exists(f'{folderName}/'):
+        os.makedirs(f'{folderName}/')
+
+    filePath = f'{folderName}/' + fileName
 
     logging.info(filePath)
 
@@ -73,25 +77,25 @@ async def main(myblob: func.InputStream):
     # else:
     #     logging.error(f"Failed to write the file at {filePath}")
 
-    if not os.path.exists('./tmp/image'):
-        os.makedirs('./tmp/image')
+    if not os.path.exists(f'{folderName}/image'):
+        os.makedirs(f'{folderName}/image')
         logging.info("image folder created")
 
 
-    if not os.path.exists('./tmp/pdf'):
-        os.makedirs('./tmp/pdf')
+    if not os.path.exists(f'{folderName}/pdf'):
+        os.makedirs(f'{folderName}/pdf')
         logging.info("pdf folder created")
 
-    if not os.path.exists('./tmp/manual'):
-        os.makedirs('./tmp/manual')
+    if not os.path.exists(f'{folderName}/manual'):
+        os.makedirs(f'{folderName}/manual')
         logging.info("manual folder created")
 
-    pdfPath = './tmp/pdf/'
+    pdfPath = f'{folderName}/pdf/'
 
     if not fileName.endswith('.pdf'):
         logging.info("file doesn't end with .pdf")
         image = Image.open(filePath)
-        filePath = './tmp/' + fileNameNoExt[0] + '.pdf'
+        filePath = f'{folderName}/' + fileNameNoExt[0] + '.pdf'
         image.save(filePath, 'PDF')
 
     id_token = GetAuth0Token()
@@ -107,10 +111,10 @@ async def main(myblob: func.InputStream):
                     for i, image in enumerate(images):
                         try:
                             logging.info(f"Image number:{i+1} started")
-                            image.save(f'./tmp/image/{fileNameNoExt[0]}_page_{i+1}.png', 'PNG')
+                            image.save(f'{folderName}/image/{fileNameNoExt[0]}_page_{i+1}.png', 'PNG')
 
-                            image = Image.open(f'./tmp/image/{fileNameNoExt[0]}_page_{i+1}.png')
-                            pdf_path = f'./tmp/pdf/{fileNameNoExt[0]}_page_{i+1}.pdf'
+                            image = Image.open(f'{folderName}/image/{fileNameNoExt[0]}_page_{i+1}.png')
+                            pdf_path = f'{folderName}/pdf/{fileNameNoExt[0]}_page_{i+1}.pdf'
                             image.save(pdf_path, 'PDF')
                             size_in_bytes = os.path.getsize(pdf_path)
                             size_in_kb_float = size_in_bytes / 1024
@@ -150,5 +154,5 @@ async def main(myblob: func.InputStream):
 
     logging.info(f"completed working on function {fileName}")
 
-    # if os.path.exists('./tmp'):
-    #     DeleteFolderContents('./tmp')
+    # if os.path.exists(f'{folderName}/'):
+    #     DeleteFolderContents(f'{folderName}/')
