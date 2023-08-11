@@ -24,6 +24,7 @@ async def main(myblob: func.InputStream):
     fileNameNoExt = fileName.split(".")[:-1]
 
     logging.info("filename: {}".format(fileName))
+    logging.info(f"file name without extension : {fileNameNoExt}")
 
     fileData = myblob.read()
     encoded_string = base64.b64encode(fileData)
@@ -32,7 +33,7 @@ async def main(myblob: func.InputStream):
     logging.info(f"given file in bytes is : \n"
                  f"{bytes_file}")
     
-    folderName = f"./{fileNameNoExt}"
+    folderName = "./" + fileNameNoExt +"/"
 
     logging.info(f"Folder Name is : {folderName}")
 
@@ -40,10 +41,10 @@ async def main(myblob: func.InputStream):
     #     DeleteFolderContents_result = DeleteFolderContents(f'{folderName}/')
     #     logging.info(DeleteFolderContents_result)
 
-    if not os.path.exists(f'{folderName}/'):
-        os.makedirs(f'{folderName}/')
+    if not os.path.exists(folderName):
+        os.makedirs(folderName)
 
-    filePath = f'{folderName}/' + fileName
+    filePath = folderName + fileName
 
     logging.info(filePath)
 
@@ -55,9 +56,9 @@ async def main(myblob: func.InputStream):
             file_contents = f.read()
 
         # Decode the file contents if necessary (e.g., for text files)
-        decoded_contents = file_contents.decode('utf-8')
+        # decoded_contents = file_contents.decode('utf-8')
 
-        logging.info(f"File contents: {decoded_contents}")
+        # logging.info(f"File contents: {decoded_contents}")
 
         # Check if the file was successfully written at filePath
         if os.path.isfile(filePath):
@@ -77,25 +78,30 @@ async def main(myblob: func.InputStream):
     # else:
     #     logging.error(f"Failed to write the file at {filePath}")
 
-    if not os.path.exists(f'{folderName}/image'):
-        os.makedirs(f'{folderName}/image')
-        logging.info("image folder created")
+    imageFolder = folderName + "image" + "/"
 
+    if not os.path.exists(imageFolder):
+        os.makedirs(imageFolder)
+        logging.info(f"image folder created : {imageFolder}")
 
-    if not os.path.exists(f'{folderName}/pdf'):
-        os.makedirs(f'{folderName}/pdf')
-        logging.info("pdf folder created")
+    pdfFolder = folderName + "pdf" + "/"
 
-    if not os.path.exists(f'{folderName}/manual'):
-        os.makedirs(f'{folderName}/manual')
-        logging.info("manual folder created")
+    if not os.path.exists(pdfFolder):
+        os.makedirs(pdfFolder)
+        logging.info(f"pdf folder created : {pdfFolder}")
 
-    pdfPath = f'{folderName}/pdf/'
+    manualFolder = folderName + "manual" + "/"
+
+    if not os.path.exists(manualFolder):
+        os.makedirs(manualFolder)
+        logging.info(f"manual folder created : {manualFolder}")
+
+    pdfPath = folderName + 'pdf/'
 
     if not fileName.endswith('.pdf'):
         logging.info("file doesn't end with .pdf")
         image = Image.open(filePath)
-        filePath = f'{folderName}/' + fileNameNoExt[0] + '.pdf'
+        filePath = folderName + fileNameNoExt + '.pdf'
         image.save(filePath, 'PDF')
 
     id_token = GetAuth0Token()
@@ -110,19 +116,29 @@ async def main(myblob: func.InputStream):
                     # loop through each image and save it as a PNG file
                     for i, image in enumerate(images):
                         try:
-                            logging.info(f"Image number:{i+1} started")
-                            image.save(f'{folderName}/image/{fileNameNoExt[0]}_page_{i+1}.png', 'PNG')
+                            imageNumber = i+1
+                            logging.info(f"{imageNumber} started")
 
-                            image = Image.open(f'{folderName}/image/{fileNameNoExt[0]}_page_{i+1}.png')
-                            pdf_path = f'{folderName}/pdf/{fileNameNoExt[0]}_page_{i+1}.pdf'
-                            image.save(pdf_path, 'PDF')
-                            size_in_bytes = os.path.getsize(pdf_path)
+                            imageSavePath = imageFolder + fileNameNoExt + "_page_" + imageNumber + '.png'
+
+                            image.save(imageSavePath, 'PNG')
+
+                            image = Image.open(imageSavePath)
+                            
+                            pdfFileName = fileNameNoExt + "_page_" + imageNumber + '.pdf'
+                            pdfSavePath = pdfPath + pdfFileName
+
+                            image.save(pdfSavePath, 'PDF')
+
+                            size_in_bytes = os.path.getsize(pdfSavePath)
                             size_in_kb_float = size_in_bytes / 1024
                             size_in_kb = int(size_in_kb_float)
+
                             logging.info(f"size_in_kb {size_in_kb} kb")
-                            blobUrl = UploadTo_rawpdf(f'{pdfPath}{fileNameNoExt[0]}_page_{i+1}.pdf', f'{fileNameNoExt[0]}_page_{i+1}.pdf')
+
+                            blobUrl = UploadTo_rawpdf(pdfSavePath, pdfFileName)
                             logging.info(f"blobUrl is : {blobUrl}")
-                            response = UploadRawToMiwayne(f'{fileNameNoExt[0]}_page_{i+1}.pdf', blobUrl,size_in_kb, id_token)
+                            response = UploadRawToMiwayne(pdfFileName, blobUrl,size_in_kb, id_token)
                             data = response.json()
                             logging.info(f"response from upload raw to miwayne is : {data}")
 
@@ -130,14 +146,15 @@ async def main(myblob: func.InputStream):
 
                             id_value = data['data']['id']
 
-                            filename_withpath = f'{folderName}/image/{fileNameNoExt[0]}_page_{i+1}_{id_value}.png'
+                            imagePathWithID = imageFolder + fileNameNoExt + "_page_" + imageNumber + "_" + id_value + '.png'
+                            imageNameWithID = fileNameNoExt + "_page_" + imageNumber + "_" + id_value + '.png'
 
-                            logging.info(filename_withpath)
+                            logging.info(imagePathWithID)
 
-                            image.save(filename_withpath, 'PNG')
+                            image.save(imagePathWithID, 'PNG')
 
 
-                            log = UploadTo_rawimage(filename_withpath, f'{fileNameNoExt[0]}_page_{i+1}_{id_value}.png')
+                            log = UploadTo_rawimage(imagePathWithID, imageNameWithID)
 
                             logging.info(log)
                             logging.info(f"Image number:{i+1} ended")
