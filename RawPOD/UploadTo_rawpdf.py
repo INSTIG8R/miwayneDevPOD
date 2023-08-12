@@ -1,5 +1,6 @@
 from azure.storage.blob import BlobServiceClient, BlobClient, ContentSettings
 import logging
+import asyncio
 
 # storage_account_key = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
 # storage_account_name = "devstoreaccount1"
@@ -13,13 +14,13 @@ container_name = "rawpdf"
 
 
 
-def UploadTo_rawpdf(file_path,file_name):
-    # blob_service_client = BlobServiceClient.from_connection_string(conn_str=connection_string)
+async def UploadTo_rawpdf(file_path, file_name):
     content_settings = ContentSettings(content_type="application/pdf")
     blob = BlobClient.from_connection_string(conn_str=connection_string, container_name=container_name, blob_name=file_name)
-    # blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
-    with open(file_path,"rb") as data:
-        blob.upload_blob(data,overwrite=True, content_settings=content_settings)
+
+    async with open(file_path, "rb") as data:
+        await blob.upload_blob(data, overwrite=True, content_settings=content_settings)
         logging.info(f"Uploaded {file_name}.")
         blobUrl = blob.url
+
     return blobUrl
