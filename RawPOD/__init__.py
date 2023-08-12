@@ -138,9 +138,9 @@ async def main(myblob: func.InputStream):
 
                             logging.info(f"size_in_kb {size_in_kb} kb")
 
-                            blobUrl = UploadTo_rawpdf(pdfSavePath, pdfFileName)
+                            blobUrl = await UploadTo_rawpdf(pdfSavePath, pdfFileName)
                             logging.info(f"blobUrl is : {blobUrl}")
-                            response = UploadRawToMiwayne(pdfFileName, blobUrl,size_in_kb, id_token)
+                            response = await UploadRawToMiwayne(pdfFileName, blobUrl,size_in_kb, id_token)
                             data = response.json()
                             logging.info(f"response from upload raw to miwayne is : {data}")
 
@@ -156,7 +156,7 @@ async def main(myblob: func.InputStream):
                             image.save(imagePathWithID, 'PNG')
 
 
-                            log = UploadTo_rawimage(imagePathWithID, imageNameWithID)
+                            log = await UploadTo_rawimage(imagePathWithID, imageNameWithID)
 
                             logging.info(log)
                             logging.info(f"Image number:{i+1} ended")

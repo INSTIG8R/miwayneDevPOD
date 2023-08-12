@@ -2,7 +2,7 @@ import requests
 import logging
 import json
 
-async def UploadRawToMiwayne(fileName,fileUrl,size_in_kb, id_token):
+def UploadRawToMiwayne(fileName,fileUrl,size_in_kb, id_token):
 
     rawPODUrl = "https://dev.test-wayne.com/api/pod/raw"
     configUrl = "https://dev.test-wayne.com/api/UIConfigurations/data/"
@@ -76,7 +76,7 @@ async def UploadRawToMiwayne(fileName,fileUrl,size_in_kb, id_token):
         f"docSize: {size_in_kb}")
 
     # with open(file_path, 'rb') as f:
-    response = await requests.post(rawPODUrl, headers=headers, json=payload, verify=False)
+    response = requests.post(rawPODUrl, headers=headers, json=payload, verify=False)
     logging.info(response)
     logging.info(response.json())
     
