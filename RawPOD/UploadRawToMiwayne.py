@@ -30,7 +30,7 @@ async def UploadRawToMiwayne(fileName, fileUrl, size_in_kb, id_token):
 
     logging.info("categoryHeaders: {}".format(categoryHeaders))
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         try:
             async with session.get(podConfigList, headers=categoryHeaders) as response:
                 podConfigListResponse = await response.text()
@@ -44,7 +44,7 @@ async def UploadRawToMiwayne(fileName, fileUrl, size_in_kb, id_token):
 
     logging.info("\n\npodID :" + podID)
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         try:
             async with session.get(rawPodConfigList, headers=categoryHeaders) as response:
                 rawPodConfigListResponse = await response.text()
@@ -78,12 +78,13 @@ async def UploadRawToMiwayne(fileName, fileUrl, size_in_kb, id_token):
                  f"fileUrl: {fileUrl} \n"
                  f"docSize: {size_in_kb}")
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         try:
             async with session.post(rawPODUrl, headers=headers, json=payload) as response:
                 result = await response.text()
                 logging.info(result)
         except aiohttp.ClientError as e:
             logging.info(e)
-
-    logging.info("uploaded successfully from function")
+    result = json.loads(result)
+    # logging.info(result)
+    return result

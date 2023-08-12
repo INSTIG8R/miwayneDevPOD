@@ -6,7 +6,7 @@ from azure.storage.blob import BlobClient
 
 def GetAuth0Token():    
     # Connection string for your Azure Storage account
-    connection_string = "DefaultEndpointsProtocol=https;AccountName=sakirsapodstage1;AccountKey=ONVKkSm6zRmOfNr1810y824wRaud90qJ60LsG0rAXj8h+r5I6d9U6fVZs0mTEV3zHN6qIYhMajkR+AStDOoStw==;BlobEndpoint=https://sakirsapodstage1.blob.core.windows.net/;QueueEndpoint=https://sakirsapodstage1.queue.core.windows.net/;TableEndpoint=https://sakirsapodstage1.table.core.windows.net/;FileEndpoint=https://sakirsapodstage1.file.core.windows.net/;"
+    connection_string = "DefaultEndpointsProtocol=https;AccountName=sakirsapoddev1;AccountKey=X1YcOGXjPoyizvmAXXher38DOlYGsND2a2TxJwZ4+qdAmGBEI5HPV9rbWC4JOXj3qIVvsyIgH3+x+AStB/U8xA==;BlobEndpoint=https://sakirsapoddev1.blob.core.windows.net/;QueueEndpoint=https://sakirsapoddev1.queue.core.windows.net/;TableEndpoint=https://sakirsapoddev1.table.core.windows.net/;FileEndpoint=https://sakirsapoddev1.file.core.windows.net/;"
 
     # Name of the container and file to download
     container_name = "token"

@@ -143,7 +143,7 @@ async def main(myblob: func.InputStream):
                             blobUrl = await UploadTo_rawpdf(pdfSavePath, pdfFileName)
                             logging.info(f"blobUrl is : {blobUrl}")
                             response = await UploadRawToMiwayne(pdfFileName, blobUrl,size_in_kb, id_token)
-                            data = response.json()
+                            data = response
                             logging.info(f"response from upload raw to miwayne is : {data}")
 
                             

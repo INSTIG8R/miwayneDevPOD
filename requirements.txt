@@ -16,3 +16,4 @@ PyPDF2
 opencv-python
 pandas
 aiohttp
+aiofiles
