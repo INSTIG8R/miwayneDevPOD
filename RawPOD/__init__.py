@@ -22,6 +22,7 @@ async def main(myblob: func.InputStream):
     nameWithPath = myblob.name
     fileName = nameWithPath.split("/")[-1]
     fileNameNoExt = fileName.split(".")[:-1]
+    fileNameNoExt = fileNameNoExt[0]
 
     logging.info("filename: {}".format(fileName))
     logging.info(f"file name without extension : {fileNameNoExt}")
