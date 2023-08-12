@@ -38,9 +38,9 @@ async def main(myblob: func.InputStream):
 
     logging.info(f"Folder Name is : {folderName}")
 
-    # if os.path.exists(f'{folderName}/'):
-    #     DeleteFolderContents_result = DeleteFolderContents(f'{folderName}/')
-    #     logging.info(DeleteFolderContents_result)
+    if os.path.exists(folderName):
+        DeleteFolderContents_result = DeleteFolderContents(folderName)
+        logging.info(DeleteFolderContents_result)
 
     if not os.path.exists(folderName):
         os.makedirs(folderName)
@@ -118,6 +118,7 @@ async def main(myblob: func.InputStream):
                     for i, image in enumerate(images):
                         try:
                             imageNumber = i+1
+                            imageNumber = str(imageNumber)
                             logging.info(f"{imageNumber} started")
 
                             imageSavePath = imageFolder + fileNameNoExt + "_page_" + imageNumber + '.png'
