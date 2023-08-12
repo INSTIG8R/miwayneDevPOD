@@ -1,85 +1,89 @@
-import requests
+import aiohttp
 import logging
 import json
 
-def UploadRawToMiwayne(fileName,fileUrl,size_in_kb, id_token):
+async def UploadRawToMiwayne(fileName, fileUrl, size_in_kb, id_token):
 
     rawPODUrl = "https://dev.test-wayne.com/api/pod/raw"
     configUrl = "https://dev.test-wayne.com/api/UIConfigurations/data/"
 
-
     ####################### Obtaining Miwayne Document Type POD Config Data #######################
 
     configModule = {
-        "POD_DOCUMENT_CATEGORY" : "POD DOCUMENT CATEGORY",
-        "POD_PROCESSED_CONFIGURATION" : "POD PROCESS CONFIGURATION",
-        "POD_RAW_CONFIGURATION" : "POD RAW CONFIGURATION",
-        "POD_MANUAL_CONFIGURATION" : "POD MANUAL CONFIGURATION",
-        "POD_CUSTOMER_VERSION_CONFIGURATION" : "POD CUSTOMER VERSION CONFIGURATION"
+        "POD_DOCUMENT_CATEGORY": "POD DOCUMENT CATEGORY",
+        "POD_PROCESSED_CONFIGURATION": "POD PROCESS CONFIGURATION",
+        "POD_RAW_CONFIGURATION": "POD RAW CONFIGURATION",
+        "POD_MANUAL_CONFIGURATION": "POD MANUAL CONFIGURATION",
+        "POD_CUSTOMER_VERSION_CONFIGURATION": "POD CUSTOMER VERSION CONFIGURATION"
     }
 
     configType = {
-        "DOCUMENT_CATEGORY" : "DOCUMENT CATEGORY"
+        "DOCUMENT_CATEGORY": "DOCUMENT CATEGORY"
     }
 
-    podConfigList = configUrl+configModule["POD_DOCUMENT_CATEGORY"]+"/"+configType['DOCUMENT_CATEGORY']
-    rawPodConfigList =configUrl+configModule["POD_RAW_CONFIGURATION"]+"/"+configType['DOCUMENT_CATEGORY']
-    
+    podConfigList = configUrl + configModule["POD_DOCUMENT_CATEGORY"] + "/" + configType['DOCUMENT_CATEGORY']
+    rawPodConfigList = configUrl + configModule["POD_RAW_CONFIGURATION"] + "/" + configType['DOCUMENT_CATEGORY']
+
     categoryHeaders = {
         "Authorization": "Bearer " + id_token
     }
 
     logging.info("categoryHeaders: {}".format(categoryHeaders))
 
-    try:
-        podConfigListResponse = requests.get(podConfigList, headers=categoryHeaders, verify=False) #will return an array 
-    except requests.exceptions.HTTPError as e:
-        logging.info(e)
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(podConfigList, headers=categoryHeaders) as response:
+                podConfigListResponse = await response.text()
+        except aiohttp.ClientError as e:
+            logging.info(e)
 
-    logging.info("\n\nconfig response: {}".format(podConfigListResponse.json()))
+    logging.info("\n\nconfig response: {}".format(podConfigListResponse))
 
-    podConfigListResponse = json.loads(podConfigListResponse.text)
+    podConfigListResponse = json.loads(podConfigListResponse)
     podID = podConfigListResponse[0]['id']
 
-    logging.info("\n\npodID :" + podID )
+    logging.info("\n\npodID :" + podID)
 
-    try:
-        rawPodConfigListResponse = requests.get(rawPodConfigList, headers=categoryHeaders, verify=False) #will return an array 
-    except requests.exceptions.HTTPError as e:
-        logging.info(e)
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(rawPodConfigList, headers=categoryHeaders) as response:
+                rawPodConfigListResponse = await response.text()
+        except aiohttp.ClientError as e:
+            logging.info(e)
 
-    logging.info("\n\nconfig response: {}".format(rawPodConfigListResponse.json()))
+    logging.info("\n\nconfig response: {}".format(rawPodConfigListResponse))
 
-    rawPodConfigListResponse = json.loads(rawPodConfigListResponse.text)
+    rawPodConfigListResponse = json.loads(rawPodConfigListResponse)
     rawPodConfigID = rawPodConfigListResponse[0]['id']
 
-    logging.info("\n\nrawPodConfigID :" + rawPodConfigID )   
+    logging.info("\n\nrawPodConfigID :" + rawPodConfigID)
 
-    payload={
+    payload = {
         "fileName": fileName,
         "documentType": "pdf",
         "categoryId": podID,
         "subCategoryId": rawPodConfigID,
         "fileUrl": fileUrl,
         "docSize": size_in_kb
-        }
+    }
 
     headers = {
-        'Authorization' : 'Bearer ' + id_token,
+        'Authorization': 'Bearer ' + id_token,
         'Content-Type': 'application/json'
     }
 
     logging.info(f"fileName: {fileName}\n"
-        f"categoryId: {podID} \n"
-        f"subCategoryId: {rawPodConfigID} \n"
-        f"fileUrl: {fileUrl} \n"
-        f"docSize: {size_in_kb}")
+                 f"categoryId: {podID} \n"
+                 f"subCategoryId: {rawPodConfigID} \n"
+                 f"fileUrl: {fileUrl} \n"
+                 f"docSize: {size_in_kb}")
 
-    # with open(file_path, 'rb') as f:
-    response = requests.post(rawPODUrl, headers=headers, json=payload, verify=False)
-    logging.info(response)
-    logging.info(response.json())
-    
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(rawPODUrl, headers=headers, json=payload) as response:
+                result = await response.text()
+                logging.info(result)
+        except aiohttp.ClientError as e:
+            logging.info(e)
+
     logging.info("uploaded successfully from function")
-
-    return response

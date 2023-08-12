@@ -2,6 +2,8 @@ import logging
 import base64
 import azure.functions as func
 import os
+import asyncio
+
 from pdf2image import convert_from_path
 from PIL import Image
 
