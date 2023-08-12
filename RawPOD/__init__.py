@@ -175,5 +175,5 @@ async def main(myblob: func.InputStream):
 
     logging.info(f"completed working on function {fileName}")
 
-    # if os.path.exists(f'{folderName}/'):
-    #     DeleteFolderContents(f'{folderName}/')
+    if os.path.exists(folderName):
+        DeleteFolderContents(folderName)
