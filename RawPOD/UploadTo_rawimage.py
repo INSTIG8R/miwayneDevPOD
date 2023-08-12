@@ -11,7 +11,7 @@ import aiofiles
 storage_account_key = "X1YcOGXjPoyizvmAXXher38DOlYGsND2a2TxJwZ4+qdAmGBEI5HPV9rbWC4JOXj3qIVvsyIgH3+x+AStB/U8xA=="
 storage_account_name = "sakirsapoddev1"
 connection_string = "DefaultEndpointsProtocol=https;AccountName=sakirsapoddev1;AccountKey=X1YcOGXjPoyizvmAXXher38DOlYGsND2a2TxJwZ4+qdAmGBEI5HPV9rbWC4JOXj3qIVvsyIgH3+x+AStB/U8xA==;BlobEndpoint=https://sakirsapoddev1.blob.core.windows.net/;QueueEndpoint=https://sakirsapoddev1.queue.core.windows.net/;TableEndpoint=https://sakirsapoddev1.table.core.windows.net/;FileEndpoint=https://sakirsapoddev1.file.core.windows.net/;"
-container_name = "temprawimage"
+container_name = "rawimage"
 
 async def UploadTo_rawimage(file_path,file_name):
     # blob_service_client = BlobServiceClient.from_connection_string(conn_str=connection_string)
