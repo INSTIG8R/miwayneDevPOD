@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
+import logging
 # Load the PNG image
 
 
@@ -19,8 +20,10 @@ def cropBoundingBox(img, filename, folderName):
     min_box_size = 200
     max_box_size = 600
 
-    if not os.path.exists(f'{folderName}/croppedImage/{filename[:-4]}_boxes'):
-        os.makedirs(f'{folderName}/croppedImage/{filename[:-4]}_boxes')
+    croppedBoxFolder = folderName + "croppedImage/" + filename[:-4] + "_boxes"
+    if not os.path.exists(croppedBoxFolder):
+        os.makedirs(croppedBoxFolder)
+        logging.info(f"cropped box folder created : {croppedBoxFolder}")
 
     for i, contour in enumerate(contours):
         # Get the minimum bounding rectangle
@@ -47,10 +50,13 @@ def cropBoundingBox(img, filename, folderName):
         # Crop the bounding box
         x, y, w, h = cv2.boundingRect(box)
         roi = image[y:y+h, x:x+w]
+        boxPNGPath = croppedBoxFolder + "/box_" + str(i+1) + ".png"
         cv2.imwrite(
-            f'{folderName}/croppedImage/{filename[:-4]}_boxes/box_{i+1}.png', roi)
+            boxPNGPath, roi)
 
-    cv2.imwrite(f'{folderName}/{filename[:-4]}_bounding_image.jpg', image)
+
+    boundingImagePath = folderName + filename[:-4] + "_bounding_image.jpg"
+    cv2.imwrite(boundingImagePath, image)
 
     log = "finised function cropBoundingBox"
 

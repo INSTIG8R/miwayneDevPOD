@@ -2,7 +2,7 @@ import requests
 import logging
 import json
 
-def UploadProcessedToMiwayne(id, code, fromA, toA,deliveryDate,id_token):
+async def UploadProcessedToMiwayne(id, code, fromA, toA,deliveryDate,id_token):
 
     ####################### List of API Endpoint #######################
 
@@ -34,10 +34,12 @@ def UploadProcessedToMiwayne(id, code, fromA, toA,deliveryDate,id_token):
 
     logging.info("categoryHeaders: {}".format(categoryHeaders))
 
-    try:
-        podConfigListResponse = requests.get(podConfigList, headers=categoryHeaders, verify=False) #will return an array 
-    except requests.exceptions.HTTPError as e:
-        logging.info(e)
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        try:
+            async with session.get(podConfigList, headers=categoryHeaders) as response:
+                podConfigListResponse = await response.text()
+        except aiohttp.ClientError as e:
+            logging.info(e)
 
     logging.info("\n\nconfig response: {}".format(podConfigListResponse.json()))
 
@@ -46,10 +48,12 @@ def UploadProcessedToMiwayne(id, code, fromA, toA,deliveryDate,id_token):
 
     logging.info(f"\n\npodID : {podID}" )
 
-    try:
-        processedPodConfigListResponse = requests.get(processedPodConfigList, headers=categoryHeaders, verify=False) #will return an array 
-    except requests.exceptions.HTTPError as e:
-        logging.info(e)
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        try:
+            async with session.get(processedPodConfigListResponse, headers=categoryHeaders) as response:
+                rawPodConfigListResponse = await response.text()
+        except aiohttp.ClientError as e:
+            logging.info(e)
 
     logging.info("\n\nconfig response: {}".format(processedPodConfigListResponse.json()))
 
@@ -81,8 +85,21 @@ def UploadProcessedToMiwayne(id, code, fromA, toA,deliveryDate,id_token):
 
 
     # with open(file_path, 'rb') as f:
-    response = requests.post(processedPODUrl, headers=headers, json=payload, verify=False)
-    logging.info(response.json())
-    logging.info("uploaded successfully from function")
 
-    return response
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        try:
+            async with session.post(processedPODUrl, headers=headers, json=payload) as response:
+                result = await response.text()
+                logging.info(result)
+        except aiohttp.ClientError as e:
+            logging.info(e)
+    result = json.loads(result)
+    # logging.info(result)
+    return result
+
+
+    # response = requests.post(processedPODUrl, headers=headers, json=payload, verify=False)
+    # logging.info(response.json())
+    # logging.info("uploaded successfully from function")
+
+    # return response

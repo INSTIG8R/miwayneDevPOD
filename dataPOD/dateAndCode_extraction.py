@@ -21,7 +21,8 @@ def dateAndCode_extraction(df, image, folderName):
     bascik_pattern = r'\bBASCIK\b|\bBASCI\b'
     uniqueCode = ''
 
-    with open(f'{folderName}/Date_Code.csv', mode='w', newline='') as file:
+    dateCSVPath = folderName + "Date_Code.csv"
+    with open(dateCSVPath, mode='w', newline='') as file:
         writer = csv.writer(file)
         # Write header row to the CSV file
         writer.writerow(['Filename', 'Extracted Date', 'Time',
@@ -54,7 +55,7 @@ def dateAndCode_extraction(df, image, folderName):
             logging.info(f"bascik: {is_bascik}\n" )
             from_ad, to_ad, uniqueCode = bascik(image)
 
-        with open(f'{folderName}/Date_Code.csv', mode='a', newline='') as file:
+        with open(dateCSVPath, mode='a', newline='') as file:
             writer = csv.writer(file)
             if text.strip():
                 writer.writerow(

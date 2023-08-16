@@ -25,11 +25,13 @@ def address_from_croppedImageCSV(id_token,folderName):
     # logging.info(city_list)
 
     # New CSV for storing extracted addresses
-    with open(f'{folderName}/Address_found.csv', mode='w', newline='') as file:
+    addressFoundCSVPath = folderName + "Address_found.csv"
+    with open(addressFoundCSVPath, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['address_type', 'address'])
 
-    df = pd.read_csv(f'{folderName}/Cropped_Text.csv')
+    croppedCSVPath = folderName + "Cropped_Text.csv"
+    df = pd.read_csv(croppedCSVPath)
 
     for i, row in df.iterrows():
         text = row['Extracted Text']
@@ -38,7 +40,7 @@ def address_from_croppedImageCSV(id_token,folderName):
         if ad != None:
             if any(keyword in ad.lower() for keyword in city_list):
                 # if ad != None:
-                with open(f'{folderName}/Address_found.csv', mode='a', newline='') as file:
+                with open(addressFoundCSVPath, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     if text.strip():
                         writer.writerow([s, ad])
