@@ -33,15 +33,15 @@ async def main(myblob: func.InputStream):
     encoded_string = base64.b64encode(fileData)
     bytes_file = base64.b64decode(encoded_string, validate=True)
 
-    logging.info(f"given file in bytes is : \n"
-                 f"{bytes_file}")
+    logging.info(f"bytes file prepared")
     
     folderName = "./" + fileNameNoExt +"/"
+    folderName2 = "./" + fileNameNoExt
 
     logging.info(f"Folder Name is : {folderName}")
 
     if os.path.exists(folderName):
-        DeleteFolderContents_result = DeleteFolderContents(folderName)
+        DeleteFolderContents_result = DeleteFolderContents(folderName2)
         logging.info(DeleteFolderContents_result)
 
     if not os.path.exists(folderName):
@@ -124,15 +124,18 @@ async def main(myblob: func.InputStream):
                             logging.info(f"{imageNumber} started")
 
                             imageSavePath = imageFolder + fileNameNoExt + "_page_" + imageNumber + '.png'
+                            logging.info(f"image save path : {imageSavePath}")
 
                             image.save(imageSavePath, 'PNG')
 
                             image = Image.open(imageSavePath)
+                            logging.info("image opened/read")
                             
                             pdfFileName = fileNameNoExt + "_page_" + imageNumber + '.pdf'
                             pdfSavePath = pdfPath + pdfFileName
 
                             image.save(pdfSavePath, 'PDF')
+                            logging.info(f"pdf saved in : {pdfSavePath}")
 
                             size_in_bytes = os.path.getsize(pdfSavePath)
                             size_in_kb_float = size_in_bytes / 1024
@@ -140,7 +143,7 @@ async def main(myblob: func.InputStream):
 
                             logging.info(f"size_in_kb {size_in_kb} kb")
 
-                            blobUrl = await UploadTo_rawpdf(pdfSavePath, pdfFileName)
+                            blobUrl = UploadTo_rawpdf(pdfSavePath, pdfFileName)
                             logging.info(f"blobUrl is : {blobUrl}")
                             response = await UploadRawToMiwayne(pdfFileName, blobUrl,size_in_kb, id_token)
                             data = response
@@ -158,7 +161,7 @@ async def main(myblob: func.InputStream):
                             image.save(imagePathWithID, 'PNG')
 
 
-                            log = await UploadTo_rawimage(imagePathWithID, imageNameWithID)
+                            log = UploadTo_rawimage(imagePathWithID, imageNameWithID)
 
                             logging.info(log)
                             logging.info(f"Image number:{i+1} ended")
@@ -176,4 +179,4 @@ async def main(myblob: func.InputStream):
     logging.info(f"completed working on function {fileName}")
 
     if os.path.exists(folderName):
-        DeleteFolderContents(folderName)
+        DeleteFolderContents(folderName2)

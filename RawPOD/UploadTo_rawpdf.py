@@ -15,7 +15,7 @@ container_name = "rawpdf"
 
 
 
-async def UploadTo_rawpdf(file_path,file_name):
+def UploadTo_rawpdf(file_path,file_name):
     # blob_service_client = BlobServiceClient.from_connection_string(conn_str=connection_string)
     content_settings = ContentSettings(content_type="application/pdf")
     blob = BlobClient.from_connection_string(conn_str=connection_string, container_name=container_name, blob_name=file_name)
